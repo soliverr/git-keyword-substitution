@@ -19,7 +19,7 @@ $ vi <PROJECT>/.gitattributes
 *.c filter=keywords
 ---<snap>---
 
-$ mkdir <PROJECT>/.git_filters/keywords
+$ mkdir <PROJECT>/.git_filters
 $ cp keywords <PROJECT>/.git_filters/keywords
 
 to enable keyword substitution:
