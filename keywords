@@ -125,7 +125,7 @@ sub meta {
         $format .= "$k=$v%n";
     }
 
-    my $branch =  `git branch | awk '/\\*/ {print \$2}'`;
+    my $branch =  `git branch | awk '/\\*/ {sub("\\\\(", "", \$2); print \$2}'`;
     chomp( $branch );
 
     $meta->{BRANCH} = $branch;
