@@ -57,6 +57,16 @@ my $config = {
 };
 
 ###
+# Debug mode: 1 - on / 0 - off
+my $debug = 0;
+
+###
+# Show debug message
+sub debug {
+    print STDERR "DBG: " . $_[0] . "\n" if $debug;
+}
+
+###
 # dump a short usage info to stdout.
 sub usage {
 
@@ -121,12 +131,13 @@ sub meta {
 
     my $format = "";
     while ( my ( $k, $v ) = each( %{ $_keywords } ) ) { # SkIp
-
         $format .= "$k=$v%n";
     }
+    debug ( "meta: format = " . $format );
 
     my $branch =  `git branch | awk '/\\*/ {sub("\\\\(", "", \$2); print \$2}'`;
     chomp( $branch );
+    debug( "meta: branch = " . $branch );
 
     $meta->{BRANCH} = $branch;
 
@@ -135,12 +146,11 @@ sub meta {
 
     foreach my $entry ( split( /\n/, $log ) ) {
 
-        
         my ( $k, $v ) = ( $1, $2 ) if ( $entry =~ /\s*([^=][^=]*)=(.*)/ );
 
         chomp( $k ) if ( defined ( $k ) );
         chomp( $v ) if ( defined ( $v ) );
-        
+
         $v =~ s/^(\s|\()*(.*)(\s|\))$/$2/ if ( defined ( $v ) ); 
 
         $meta->{$k} = $v if ( $v and not $v =~ $_keywords->{$k} ); # SkIp
@@ -223,9 +233,9 @@ sub smudge {
 
             $curr[$idx] = history( $_path, $2, $3, $4, $1 );
         } else {
-
             $curr[$idx] = subst( $meta, $curr[$idx] );
         }
+        debug( "smudge: idx = " . $idx . " line = " . $curr[$idx] );
     }
 
     return join ( "\n", @curr );
@@ -296,7 +306,6 @@ sub main {
 
     my $curr = undef;
     if (not -t STDIN) {
-    
         $curr = join( "", <STDIN> );
     } else {
 
@@ -306,8 +315,7 @@ sub main {
     }
 
     if ( $config->{mode} =~ /smudge/i ) {
-
-        print smudge( $config->{KEYWORDS}, $config->{file}, $curr ); 
+        print smudge( $config->{KEYWORDS}, $config->{file}, $curr );
     } else {
 
         my $prev = `git cat-file blob HEAD:$config->{file} 2>&1`;
