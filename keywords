@@ -141,7 +141,9 @@ sub meta {
 
     $meta->{BRANCH} = $branch;
 
-    my $log = `git log -g -n 1 --pretty="$format" "$branch" -- "$_path" 2>/dev/null`;
+    my $log = `git log -n 1 --pretty="$format" "$branch" -- "$_path" 2>/dev/null`;
+    debug( "meta: log = " . $log );
+
     return if ( not $log );
 
     foreach my $entry ( split( /\n/, $log ) ) {
